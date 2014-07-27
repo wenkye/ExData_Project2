@@ -1,24 +1,18 @@
-if (!require("plyr")) {
-    install.packages("plyr")
-}
-if (!require("ggplot2")) {
-    install.packages("ggplot2")
-}
 
-library(plyr)
 library(ggplot2)
+library(plyr)
 
 #Load data
 NEI <- readRDS("./exdata-data-NEI_data/summarySCC_PM25.rds")
 SCC <- readRDS("./exdata-data-NEI_data/Source_Classification_Code.rds")
 
-data <- NEI[NEI$fips == "24510", ]
+subset <- NEI[NEI$fips == "24510", ] 
 
-png("./figure/plot3.png")
+ggsave("./figure/plot3.png",width=10, height=10,dpi=72)
 
-totalEmissions <- aggregate(data$Emissions, list(data$year), FUN="sum")
+g <- ggplot(subset, aes(year, Emissions, color = type))
+g + geom_line(stat = "summary", fun.y = "sum") +
+    ylab(expression('Total PM'[2.5]*" Emissions")) +
+    ggtitle("Total Emissions in Baltimore City from 1999 to 2008")
 
-plot(totalEmissions, type="l", xlab="year", main="Total Emissions for Baltimore County from 1999 to 2008", 
-     ylab=expression('Total PM'[2.5]* " Emission"))
-
-dev.off()
+graphics.off()
